@@ -118,7 +118,7 @@ afn/
 
 ```bash
 # 克隆
-git clone https://github.com/<你的账号>/academic-frontier-navigator.git
+git clone https://github.com/8lwl8/academic-frontier-navigator.git
 cd academic-frontier-navigator
 
 # 配置身份
@@ -171,9 +171,9 @@ pre-commit install --config configs/.pre-commit-config.yaml
 
 | 入口 | 链接 | 状态 |
 | --- | --- | --- |
-| Web 展示入口 | <待部署后补充> | ⏳ |
-| GitHub 仓库 | <待补充> | ⏳ |
-| Gitee 镜像 | <待补充> | ⏳ |
+| Web 展示入口 | <待部署后补充> | ⏳ 待部署 |
+| GitHub 仓库（主仓） | <https://github.com/8lwl8/academic-frontier-navigator> | ✅ 公开可访问 |
+| Gitee 镜像 | <待配置> | ⏳ 待配置 |
 
 > 赛事要求作品必须是在线可点击访问的 Web 链接，不能提交本地 `localhost`。
 
