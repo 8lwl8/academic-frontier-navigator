@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://afn.local/schemas/asset.schema.json",
+  "title": "AFN 知识资产数据结构",
+  "description": "对应 data/assets/asset-*.json。依据架构书 六(一)「个人知识资产：用户自主控制可见度（私密/校内/公开）」与 六(二)「可见度控制：默认私密」。",
+  "type": "object",
+  "required": ["schema_version", "asset_id", "type", "title", "visibility", "created_at"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "asset_id": {
+      "type": "string",
+      "pattern": "^asset-\\d{4}$",
+      "description": "资产唯一标识"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["note", "summary", "route_snapshot", "literature_card"],
+      "description": "资产类型：笔记 / 摘要 / 路线快照 / 文献卡片"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "summary": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "content_path": {
+      "type": "string",
+      "description": "正文所在的 Markdown 路径（knowledge/personal/ 下）"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "maxItems": 10
+    },
+    "origin": {
+      "type": "object",
+      "description": "资产来源，用于溯源。对应架构书三(一)「资产提炼 Skill：输入对话记录，输出结构化知识条目」",
+      "required": ["kind"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["conversation", "reading", "manual"]
+        },
+        "ref": {
+          "type": "string",
+          "description": "来源标识，如会话 ID 或文献 ID"
+        },
+        "extracted_by": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+@v\\d+\\.\\d+$"
+        }
+      }
+    },
+    "visibility": {
+      "type": "string",
+      "enum": ["private", "campus", "public"],
+      "default": "private",
+      "description": "可见度。严格对应架构书六(一)的访问控制，默认 private（六(二)：默认私密）"
+    },
+    "created_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "updated_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    }
+  }
+}

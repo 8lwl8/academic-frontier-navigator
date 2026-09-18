@@ -1,0 +1,139 @@
+# AFN 主配置
+# 依据：架构书 三(二) 定时任务设计、三(四) 知识库设计、六(二) 合规设计要点
+# 规范：SPEC-02 §5 YAML 约定
+#
+# ⚠️ 本文件不得包含任何真实密钥。需要时使用 ${ENV_VAR_NAME} 引用环境变量。
+
+config_version: "1.0"
+updated_at: "2026-09-18"
+
+# ============================================================
+# 前沿动态每日追踪（架构书 三(二)）
+# ============================================================
+frontier_radar:
+  # 触发策略：按固定周期触发，避免高频触发消耗算力
+  schedule:
+    enabled: true
+    cron: "0 8 * * *"                 # 每日 08:00
+    timezone: "Asia/Shanghai"
+
+  # 任务范围：可配置关注的关键词集合、论文来源、时间窗口
+  scope:
+    keywords:
+      - 多模态
+      - 视觉语言模型
+      - 具身智能
+    sources:
+      - arxiv
+    lookback_days: 7
+
+  # 产出形态：结构化简报（可被 Web 入口直接消费）+ 对话内推送
+  output:
+    formats: [json, dialogue]
+    data_path: data/briefing
+    naming: "briefing-{briefing_date}.json"
+
+  # 幂等性：同一天重复触发不应产生重复简报
+  idempotent: true
+
+  # 失败处理：抓取失败时降级为「本次暂无可更新内容」并记录，不阻塞用户其他操作
+  on_failure:
+    strategy: degrade
+    message: 本次暂无可更新内容
+    mark_degraded: true
+    log_path: logs/radar-failure.log
+
+# ============================================================
+# 相关性分层（架构书 四(二)）
+# ============================================================
+relevance:
+  levels: [high, medium, low]
+  default_level: medium
+  # 高相关内容优先展示
+  display_order: [high, medium, low]
+
+# ============================================================
+# 知识库（架构书 三(四)）
+# ============================================================
+knowledge_base:
+  domains_path: knowledge/domains
+  intelligence_path: knowledge/intelligence
+  personal_path: knowledge/personal
+
+  # 语料准入标准：来源可公开访问、有明确作者与出处
+  ingestion:
+    require_source_url: true
+    require_public_access: true
+    reject_unknown_origin: true
+    # 属于该领域奠基性或代表性成果、时效性满足要求
+    min_level: 入门
+
+  # 知识组织：按「领域 → 子方向 → 知识点 → 文献」层级组织
+  organization:
+    hierarchy: [domain, sub_domain, knowledge_point, literature]
+    # 知识点依赖关系建模，是学习路线生成的依据
+    build_dependency_graph: true
+    detect_cycles: true
+
+# ============================================================
+# 长期记忆（架构书 三(三)）
+# ============================================================
+memory:
+  # 记忆写入原则：只沉淀有长期价值的结构化信息，不记录原始对话流水
+  store_raw_dialogue: false
+  layers:
+    - user_profile      # 用户画像：决定输出的深度与假设前提
+    - progress          # 进度记忆：支撑路线动态调整
+    - preference        # 偏好记忆：提升个性化程度
+    - project_trajectory # 项目轨迹：支撑跨会话的连贯指导
+
+# ============================================================
+# 合规（架构书 六(二)）
+# ============================================================
+compliance:
+  # 知识边界声明：超出知识范围时必须显式声明，不得推测性作答
+  knowledge_boundary_declaration: true
+  # 出处标注：所有学术内容附来源，便于用户核验
+  require_citation: true
+  # 可见度控制：个人资产遵循平台权限体系，默认私密
+  default_visibility: private
+  visibility_levels: [private, campus, public]
+  # 知识产权：第三方库与开源资源在文档中注明
+  third_party_manifest: docs/第三方资源清单.md
+  # AI 使用边界：严格遵守手册 8.3，保留完整迭代记录以备评审
+  ai_iteration_log_required: true
+  ai_iteration_log_path: iteration-log
+
+# ============================================================
+# Web 展示层（架构书 四(二)、五(二)）
+# ============================================================
+web:
+  # 只读展示加跳转入口的极简定位，不实现独立的智能体逻辑
+  readonly: true
+  # 数据来自智能体输出结果的落地存储，不做实时双向同步
+  data_path: data
+  data_sync: static
+  # 页面
+  pages:
+    - id: home
+      name: 首页
+      data_source: static
+    - id: route
+      name: 学习路线
+      data_source: data/route
+    - id: briefing
+      name: 前沿简报
+      data_source: data/briefing
+    - id: assets
+      name: 知识资产
+      data_source: data/assets
+
+# ============================================================
+# 数据格式（架构书 五(一)）
+# ============================================================
+formats:
+  knowledge_unit: markdown     # Markdown 承载知识单元
+  structured_output: json      # JSON 承载结构化输出
+  configuration: yaml          # YAML 承载配置
+  encoding: utf-8
+  line_ending: lf

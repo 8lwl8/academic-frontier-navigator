@@ -1,0 +1,75 @@
+# ---- AFN 忽略规则 ----
+# 依据：SPEC-02 §7 数据分类与可见度、§8 密钥管理
+
+# ==== 密钥与本地配置（严禁入库）====
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets.*
+credentials.*
+
+# ==== 真实个人数据（架构书六(一)「中」敏感级，不得入库）====
+# 仅保留 *.example.md / *.example.json 脱敏样例
+*.private.md
+*.private.json
+*.private.yaml
+*.private.yml
+knowledge/personal/*
+!knowledge/personal/README.md
+!knowledge/personal/*.example.md
+!knowledge/personal/*.example.json
+!knowledge/personal/.gitkeep
+
+# ==== Python ====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ==== Node（仅用于 commitlint 等工具链，不构建产物）====
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# ==== 运行产物与日志 ====
+logs/
+*.log
+.afn-cache/
+.cache/
+
+# ==== 操作系统与编辑器 ====
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/*
+!.vscode/settings.json.example
+!.vscode/extensions.json.example
+*.swp
+*.swo
+*~
+
+# ==== 临时文件 ====
+*.tmp
+*.bak
+*.orig
+*.rej
+tmp/
+temp/

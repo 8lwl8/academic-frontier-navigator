@@ -1,0 +1,46 @@
+# EditorConfig
+# 依据：SPEC-02 §2.1 字符与编码
+# 说明：统一不同编辑器的缩进、换行与编码，从源头避免格式差异导致的整文件 diff。
+
+root = true
+
+# ---- 默认规则 ----
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# ---- Markdown ----
+# 中文长句无法机械断行，且双空格是换行语法，因此不去除行尾空格
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# ---- Python（自研 Skills 与本地脚本）----
+[*.py]
+indent_size = 4
+max_line_length = 100
+
+# ---- JSON / YAML ----
+[*.{json,yaml,yml}]
+indent_size = 2
+
+# ---- 前端（原生 JS，无构建工具）----
+[*.{html,css,js}]
+indent_size = 2
+
+# ---- Git 相关 ----
+[*.{gitignore,gitattributes}]
+indent_size = 2
+
+# ---- Makefile 与批处理必须用 Tab ----
+[{Makefile,*.mk}]
+indent_style = tab
+
+# ---- 二进制文件不做格式约束 ----
+[*.{png,jpg,jpeg,gif,ico,pdf,zip,docx,xlsx,pptx,mp4,woff,woff2,ttf}]
+insert_final_newline = false
+trim_trailing_whitespace = false

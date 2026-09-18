@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://afn.local/schemas/briefing.schema.json",
+  "title": "AFN 每日简报数据结构",
+  "description": "对应 data/briefing/briefing-YYYY-MM-DD.json。依据架构书 四(二)「简报采用按相关性分层的列表，高相关内容优先展示」与 三(二) 定时任务的幂等性要求。",
+  "type": "object",
+  "required": ["schema_version", "briefing_date", "keywords", "generated_at", "items", "stats"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$"
+    },
+    "briefing_date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "简报日期。文件名固定为 briefing-<briefing_date>.json，同日重复生成直接覆盖以保证幂等性。"
+    },
+    "keywords": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "本次关注的关键词集合，对应 configs 中 frontier_radar.scope.keywords"
+    },
+    "time_window": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "to": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\+08:00$"
+    },
+    "generated_by": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+@v\\d+\\.\\d+$"
+    },
+    "items": {
+      "type": "array",
+      "description": "简报条目。数组顺序应与 relevance 优先级一致（high 在前）。",
+      "items": {
+        "type": "object",
+        "required": ["paper_id", "title", "relevance", "source"],
+        "additionalProperties": false,
+        "properties": {
+          "paper_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "论文唯一标识，如 arxiv-2509.01234"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "authors": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "published_date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "relevance": {
+            "type": "string",
+            "enum": ["high", "medium", "low"],
+            "description": "相关性分层，对应架构书四(二)「按相关性分层的列表」"
+          },
+          "relevance_reason": {
+            "type": "string",
+            "minLength": 1,
+            "description": "相关性判定依据，需与用户研究方向关联，不可为空泛描述"
+          },
+          "quick_read": {
+            "type": "string",
+            "minLength": 1,
+            "description": "学术 Agent 给出的中文一句话速读"
+          },
+          "pdf_url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https?://"
+          },
+          "source": {
+            "$ref": "#/$defs/source"
+          }
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "required": ["total_fetched", "total_included"],
+      "additionalProperties": false,
+      "properties": {
+        "total_fetched": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "本次抓取总量"
+        },
+        "total_included": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "入选简报的数量"
+        },
+        "high_relevance": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "高相关条目数"
+        }
+      }
+    },
+    "degraded": {
+      "type": "boolean",
+      "default": false,
+      "description": "是否处于降级状态。对应架构书三(二)「抓取失败时降级为『本次暂无可更新内容』并记录，不阻塞用户其他操作」。"
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "description": "出处标注。架构书六(二)合规硬性要求。",
+      "required": ["type", "title", "url"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["paper", "textbook", "survey", "course", "repo", "doc"]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "authors": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https?://"
+        },
+        "published_date": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      }
+    }
+  }
+}

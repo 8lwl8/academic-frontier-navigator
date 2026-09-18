@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "briefing_date": "2026-09-18",
+  "keywords": ["多模态"],
+  "time_window": { "from": "2026-09-11", "to": "2026-09-18" },
+  "generated_at": "2026-09-18T08:00:00+08:00",
+  "generated_by": "briefing-generate@v1.0",
+  "items": [
+    {
+      "paper_id": "arxiv-2509.01234",
+      "title": "示例论文标题",
+      "authors": ["作者甲"],
+      "published_date": "2026-09-16",
+      "relevance": "high",
+      "relevance_reason": "与用户关注方向「多模态对齐」高度相关",
+      "quick_read": "一句话中文速读示例。",
+      "pdf_url": "https://arxiv.org/pdf/2509.01234",
+      "source": {
+        "type": "paper",
+        "title": "示例论文标题",
+        "url": "https://arxiv.org/abs/2509.01234"
+      }
+    }
+  ],
+  "stats": { "total_fetched": 42, "total_included": 5, "high_relevance": 2 }
+}

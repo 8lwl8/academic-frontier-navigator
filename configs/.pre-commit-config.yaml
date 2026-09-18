@@ -1,0 +1,88 @@
+# pre-commit 钩子配置
+# 依据：SPEC-00 §4 四级可用性（L2 编辑器级校验）、SPEC-02 格式约定
+#
+# 安装：
+#   pip install pre-commit
+#   pre-commit install
+#
+# 说明：架构书五(三)排除了生产级 CI/CD。此处仅做本地轻量校验，
+#       若钩子拖慢迭代节奏，可临时用 git commit --no-verify 绕过，
+#       但必须在 iteration-log/ 中记录绕过原因（SPEC-00 §4）。
+
+repos:
+  # ---- 通用文件卫生 ----
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace          # 去除行尾空格
+        exclude: \.(md|txt)$             # Markdown 中双空格是换行语法，排除
+      - id: end-of-file-fixer            # 文件末尾保留一个换行
+      - id: check-yaml                   # YAML 语法校验
+        files: \.ya?ml$
+        args: [--allow-multiple-documents]
+      - id: check-json                   # JSON 语法校验
+        files: \.json$
+      - id: check-merge-conflict         # 禁止提交冲突标记
+      - id: check-added-large-files      # 拦截大文件
+        args: [--maxkb=1024]             # 单文件上限 1MB（SPEC-02 §4.1）
+      - id: mixed-line-ending            # 统一换行为 LF
+        args: [--fix=lf]
+      - id: detect-private-key           # 检测私钥泄露
+      - id: check-case-conflict          # 避免大小写重名（跨平台兼容）
+
+  # ---- Markdown 格式 ----
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.43.0
+    hooks:
+      - id: markdownlint
+        args:
+          - --disable
+          - MD013   # 关闭行长度限制（中文长句无法机械断行）
+          - MD033   # 允许内联 HTML
+          - MD041   # 允许文件不以 H1 开头（front matter 场景）
+          - --
+
+  # ---- Python 代码规范（自研 Skills 与脚本）----
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^(skills|scripts)/.*\.py$
+      - id: ruff-format
+        files: ^(skills|scripts)/.*\.py$
+
+  # ---- 提交信息校验 ----
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.18.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]
+        additional_dependencies: ['@commitlint/config-conventional']
+
+  # ---- 本地自定义校验 ----
+  - repo: local
+    hooks:
+      # JSON Schema 校验：data/ 下的数据文件必须符合 schemas/ 中的契约
+      - id: validate-json-schemas
+        name: 校验 JSON Schema 契约
+        entry: python scripts/validate_schemas.py
+        language: system
+        files: ^data/.*\.json$
+        pass_filenames: false
+
+      # 密钥扫描：configs/ 下不得出现疑似密钥
+      - id: scan-secrets
+        name: 扫描配置中的疑似密钥
+        entry: python scripts/scan_secrets.py
+        language: system
+        files: ^configs/.*\.(ya?ml|json)$
+        pass_filenames: true
+
+      # 敏感数据拦截：真实个人数据不得入库
+      - id: block-private-data
+        name: 拦截真实个人数据
+        entry: python scripts/block_private_data.py
+        language: system
+        files: ^knowledge/personal/.*$
+        pass_filenames: true

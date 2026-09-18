@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "route_id": "route-cv-2026-09-18",
+  "topic": "计算机视觉",
+  "generated_at": "2026-09-18T14:42:00+08:00",
+  "generated_by": "route-generate@v1.0",
+  "user_profile_ref": "profile-anon-0001",
+  "stages": [
+    {
+      "stage_id": "stage-01",
+      "name": "前置基础",
+      "order": 1,
+      "estimated_weeks": 2,
+      "knowledge_points": [
+        {
+          "kp_id": "kn-0003",
+          "name": "线性代数基础",
+          "level": "入门",
+          "status": "completed",
+          "prerequisites": [],
+          "source": {
+            "type": "textbook",
+            "title": "Linear Algebra and Its Applications",
+            "url": "https://example.org/ref"
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    { "from": "kn-0003", "to": "kn-0001", "relation": "prerequisite_of" }
+  ]
+}

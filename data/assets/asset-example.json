@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "asset_id": "asset-0001",
+  "type": "note",
+  "title": "示例知识资产",
+  "summary": "这是脱敏样例。",
+  "tags": ["对比学习"],
+  "origin": { "kind": "conversation", "ref": "session-2026-09-18-01", "extracted_by": "asset-extract@v1.0" },
+  "visibility": "private",
+  "created_at": "2026-09-18",
+  "updated_at": "2026-09-18"
+}
