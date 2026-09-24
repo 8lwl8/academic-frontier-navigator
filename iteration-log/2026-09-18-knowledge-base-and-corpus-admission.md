@@ -386,5 +386,51 @@ configs/afn.config.yaml   → ✅ YAML 语法通过（config_version 1.1）
 推送完成后，在此回填：
 
 - 对应提交：`feat(knowledge): 定义知识库分库结构与语料准入标准`
-- commit short hash：`<待补>`
+- commit short hash：`d068201`
 - 分支：`feat/knowledge-base-admission-spec`
+- PR：#1（`https://github.com/8lwl8/academic-frontier-navigator/pull/1`）
+
+### 2026-09-24 追加：交付受阻与一次真实事故
+
+#### （一）交付路径受阻记录
+
+本轮推送不在正常链路上完成，如实记录：
+
+| # | 尝试 | 结果 |
+| --- | --- | --- |
+| 1 | 通过集成直接写仓库（`push_files` / `create_or_update_file`） | 403 `Resource not accessible by integration`，集成仅有读权限 |
+| 2 | 用户在本地 `git push`（直连） | 首次推送因未配置 `user.name` / `user.email`，**推了一个空分支上去**（`Total 0`） |
+| 3 | 用 `tar.gz` 交付压缩包 | Windows `tar.exe` 对 GBK / UTF-8 文件名处理不一致，解压后 18 个中文名文件乱码（如 `kn-0004-娉ㄦ剰鍔涙満鍒?md`），并产生 18 次 `Invalid empty pathname`，文件还多嵌套了一层目录 |
+| 4 | 改用分片 + `Invoke-WebRequest` 重试 | 用户否决该方案（操作过重） |
+
+**最终方案**：把 18 个中文文件名全部改为英文 kebab-case，同步更新 6 处内部引用，重新打包为纯 ASCII 路径的 zip，用户解压后推送成功（30 files changed / 3874 insertions）。
+
+> **收获**：跨平台交付物不应含非 ASCII 文件名。这与 SPEC-01 §四「文件名 kebab-case」的约定方向一致 —— 该约定不只是风格问题，也是**可交付性**问题。
+
+#### （二）一次真实事故：派生数据与源数据不一致
+
+验收时逐字节比对远端产物，发现 `_graph.json` 的 `stats.root_nodes` **列了全部 15 个节点**，但真实入度为 0 的起点只有 5 个（`kn-0001` / `kn-0008` / `kn-0009` / `kn-0014` / `kn-0015`）。继续核对，`_index.md` §4.1 又写作「4 个」且漏掉 `kn-0015`，§4.2 的汇点清单也不完整。**三处数字互不一致。**
+
+**根本原因**：`_graph.json` 在文档里被声明为「由脚本导出」，实际是手工写的，因此没有任何机制能发现它与 front matter 的偏差；当时的 `check_knowledge_units.py` 只校验源数据，不校验派生产物。**这导致一套自相矛盾的数据在「校验全绿」的状态下被提交到了远端。**
+
+**加固措施**（属工具链改进，非文档修补）：
+
+1. `check_knowledge_units.py` 新增 `check_graph_export()`，逐项核对 `_graph.json` 的节点集、前置边集、四项计数、`root_nodes`、`sink_nodes` 与源数据是否完全一致（对应新增的 SPEC-06 §5.6）
+2. 明确并固化口径：`root_nodes` / `sink_nodes` **仅在 `prerequisite_of` 与 `extends` 子图上计算**，`related_to` 不计入；该口径写入 `schemas/knowledge-graph.schema.json` 的字段描述
+3. Schema 新增 `stats.sink_nodes` 字段，修正三处数据
+4. **负向测试验证**：① 把 `root_nodes` 改回 15 个 → 拦截成功；② 从 `_graph.json` 删一条前置边 → 拦截成功
+
+> 修复脚本自身还发生了一次自我纠错：我第一版补的 `sink_nodes` 写了 5 个，新校验立刻报出真实值应为 7 个（补 `kn-0007`、`kn-0010`）。**这说明校验逻辑确实在工作，而不是写了个恒返回空的函数。**
+
+**教训（本轮最重要的一条）**：
+
+> **声明一种约束而不实现它，比不声明更危险 —— 因为团队会信任它。**
+>
+> 「唯一事实来源」若不伴随机器校验，就只是文档修辞。凡是声称「由脚本派生」的产物，都必须让脚本真的去派生或校验，否则它只是一份措辞像导出的手写文件，而手写文件必然会漂移。
+
+已同步写入 ADR-0001 §五 与 SPEC-06 §5.6。
+
+#### （三）由此调整的后续待办优先级
+
+- `scripts/export_graph.py`（把 `_graph.json` 真正改为生成而非手写）**优先级由「待办」上调为「最高优先」** —— 与「依赖边人工评审」并列
+- 在 CI 中接入四个校验脚本，作为 PR 必过检查

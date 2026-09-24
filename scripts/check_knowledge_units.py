@@ -19,6 +19,7 @@
     8. prerequisite_of / extends 子图无循环依赖（SPEC-06 §5.4）
     9. 每条 prerequisites 边在两个知识点间一致（双向核对）
    10. 正文含「参考来源」段落（SPEC-02 §3.2）
+   11. _graph.json 与源数据一致（节点/边/stats/root_nodes/sink_nodes，SPEC-06 §5.5）
 
 用法：
     python scripts/check_knowledge_units.py              # 校验
@@ -33,6 +34,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from collections import defaultdict, deque
@@ -142,6 +144,104 @@ def build_graph(units: dict[str, dict]) -> tuple[dict[str, list[str]], list[str]
             problems.append(f"{u['path']}：prerequisites 中 `{d}` 重复出现")
 
     return adj, problems
+
+
+def check_graph_export(units: dict[str, dict], adj: dict[str, list[str]]) -> list[str]:
+    """核对 _graph.json 的 stats 与知识单元源数据是否一致。
+
+    SPEC-06 §5.5：_graph.json 是派生实体，front matter 才是唯一事实来源。
+    派生数据一旦与源数据不一致，会静默误导路线生成（例如 root_nodes 列错，
+    路线规划就会并行开启错误的起点）。因此必须机器校验。
+    """
+    problems: list[str] = []
+    graph_file = DOMAINS_DIR / "_graph.json"
+    if not graph_file.exists():
+        return [f"缺少 {graph_file.name}（SPEC-06 §5.5 要求依赖图导出）"]
+
+    try:
+        g = json.loads(graph_file.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        return [f"{graph_file.name}：JSON 解析失败 —— {exc}"]
+
+    nodes = g.get("nodes", [])
+    edges = g.get("edges", [])
+    stats = g.get("stats", {})
+
+    # 节点集合一致性
+    src_ids = set(units)
+    node_ids = {n.get("kp_id") for n in nodes}
+    if src_ids != node_ids:
+        only_src = sorted(src_ids - node_ids)
+        only_graph = sorted(node_ids - src_ids)
+        if only_src:
+            problems.append(
+                f"_graph.json 缺少节点：{only_src}（源数据中存在，SPEC-06 §5.5）"
+            )
+        if only_graph:
+            problems.append(
+                f"_graph.json 存在无出处的节点：{only_graph}（源数据中不存在）"
+            )
+
+    # 边集合一致性：由 prerequisites 推出的应然边 vs 文件中的 prerequisite_of 边
+    expected = {(a, b) for a, bs in adj.items() for b in bs}
+    actual = {
+        (e.get("from"), e.get("to"))
+        for e in edges
+        if e.get("relation") == "prerequisite_of"
+    }
+    missing = sorted(expected - actual)
+    extra = sorted(actual - expected)
+    if missing:
+        problems.append(f"_graph.json 漏了 prerequisite_of 边：{missing}（SPEC-06 §5.5）")
+    if extra:
+        problems.append(
+            f"_graph.json 多了源数据中没有的 prerequisite_of 边：{extra}（SPEC-06 §5.5）"
+        )
+
+    # stats 数值一致性
+    if stats.get("total_nodes") != len(src_ids):
+        problems.append(
+            f"_graph.json stats.total_nodes={stats.get('total_nodes')}，"
+            f"实际 {len(src_ids)}"
+        )
+    pre_edges = len(actual)
+    if stats.get("prerequisite_edges") != pre_edges:
+        problems.append(
+            f"_graph.json stats.prerequisite_edges={stats.get('prerequisite_edges')}，"
+            f"实际 {pre_edges}"
+        )
+    rel_edges = sum(1 for e in edges if e.get("relation") == "related_to")
+    if stats.get("related_edges") != rel_edges:
+        problems.append(
+            f"_graph.json stats.related_edges={stats.get('related_edges')}，"
+            f"实际 {rel_edges}"
+        )
+    if stats.get("total_edges") != len(edges):
+        problems.append(
+            f"_graph.json stats.total_edges={stats.get('total_edges')}，实际 {len(edges)}"
+        )
+
+    # root_nodes / sink_nodes：必须由 prerequisite_of 子图推出，且完全一致
+    real_roots = sorted(src_ids - {b for _, b in expected})
+    declared_roots = sorted(stats.get("root_nodes") or [])
+    if declared_roots != real_roots:
+        problems.append(
+            f"_graph.json stats.root_nodes 与源数据不符（SPEC-06 §5.5）：\n"
+            f"        声明 = {declared_roots}\n"
+            f"        实际 = {real_roots}"
+        )
+
+    if "sink_nodes" in stats:
+        real_sinks = sorted(src_ids - {a for a, _ in expected})
+        declared_sinks = sorted(stats.get("sink_nodes") or [])
+        if declared_sinks != real_sinks:
+            problems.append(
+                f"_graph.json stats.sink_nodes 与源数据不符（SPEC-06 §5.5）：\n"
+                f"        声明 = {declared_sinks}\n"
+                f"        实际 = {real_sinks}"
+            )
+
+    return problems
 
 
 def detect_cycle(nodes: list[str], adj: dict[str, list[str]]) -> list[str] | None:
@@ -284,6 +384,9 @@ def main() -> int:
             f"检测到循环依赖：{' → '.join(cycle)}"
             f"（SPEC-06 §5.4，会破坏路线生成能力）"
         )
+
+    # ---------- _graph.json 与源数据一致性（SPEC-06 §5.5） ----------
+    errors.extend(check_graph_export(units, adj))
 
     # ---------- 输出 ----------
     roots = [n for n in sorted(units) if not any(n in v for v in adj.values())]

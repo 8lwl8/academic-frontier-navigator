@@ -118,7 +118,15 @@
         },
         "root_nodes": {
           "type": "array",
-          "description": "入度为 0 的起始节点。路线生成可据此并行开启多条学习线",
+          "description": "入度为 0 的起始节点。口径：仅在 prerequisite_of 与 extends 子图上计算（related_to 对称且不构成前置，不计入入度）。路线生成可据此并行开启多条学习线",
+          "items": {
+            "type": "string",
+            "pattern": "^kn-\\d{4}$"
+          }
+        },
+        "sink_nodes": {
+          "type": "array",
+          "description": "出度为 0 的终点节点。口径同 root_nodes，仅在 prerequisite_of 与 extends 子图上计算",
           "items": {
             "type": "string",
             "pattern": "^kn-\\d{4}$"

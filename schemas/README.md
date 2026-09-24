@@ -43,3 +43,23 @@ Schema 内的 `schema_version` 字段与 Schema 文件本身**同步演进**：
 
 它的权威来源仍是各知识单元 front matter 里的 `prerequisites` 字段
 （详见 SPEC-06 §5 与 ADR-0001）。
+
+### `stats.root_nodes` / `stats.sink_nodes` 的计算口径
+
+这两个字段容易算错，口径已固化在 Schema 的字段描述里：
+
+> **只在 `prerequisite_of` 与 `extends` 子图上计算**，`related_to` 不计入度数。
+
+理由：`related_to` 是对称的弱关联，不构成学习顺序上的前置或后继。
+`root_nodes` 是「可以直接开始学」的知识点，`sink_nodes` 是「没有后继依赖它」的知识点，
+两者描述的都是**学习路线的头尾**，因此只应看前置边。
+
+> ⚠️ **这个口径是被一次真实事故逼出来的。** 该 Schema 首次定稿时，`_graph.json` 的
+> `root_nodes` 被误填为全部 15 个节点（真实为 5 个），`_index.md` 又写作 4 个 ——
+> `additionalProperties: false` 与 `has_cycle` 的 `const: false` 都没能拦住它，
+> **因为它们是手写 JSON 且与源数据比对从未发生过**。
+> 现在由 `scripts/check_knowledge_units.py` 的 `check_graph_export()` 强制比对
+> （SPEC-06 §5.6）。
+
+Schema 校验**契约形状**（字段是否存在、类型是否正确），
+派生数据校验**取值是否与源数据一致** —— 两者互补，缺一不可。

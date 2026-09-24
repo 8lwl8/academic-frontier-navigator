@@ -31,16 +31,21 @@
 - **知识点依赖图导出**：`knowledge/domains/_graph.json`
   - 15 个节点、19 条边（12 条前置关系 + 7 条相关关系）
   - 无循环依赖，起始节点 5 个：kn-0001 / kn-0008 / kn-0009 / kn-0014 / kn-0015
+  - 汇点 7 个：kn-0002 / kn-0007 / kn-0010 / kn-0012 / kn-0013 / kn-0014 / kn-0015
 - **知识库索引**：`knowledge/domains/_index.md`，登记子方向、知识点清单、依赖概览与已知缺口
+  - 起点与汇点清单标注计算口径（只数前置边，`related_to` 不计入）
 - **动态情报库说明**：`knowledge/intelligence/README.md`，含双层存储（JSON 机器可读 + Markdown 人读）、
   幂等命名规则、降级处理约定
 - **个人资产库说明与脱敏样例**：`knowledge/personal/README.md`，含四层记忆结构
   （用户画像 / 进度记忆 / 偏好记忆 / 项目轨迹）与脱敏规则
 - **知识点依赖图 Schema**：`schemas/knowledge-graph.schema.json`
   - 采用 JSON Schema Draft 2020-12，`stats.has_cycle` 硬约束为 `false`
+  - 新增 `stats.sink_nodes` 字段，并在字段描述中明确 `root_nodes` / `sink_nodes` 的「只数前置边」口径
 - **知识单元校验脚本**：`scripts/check_knowledge_units.py`
   - 校验 front matter 完整性、编号格式与全局唯一性、子方向登记状态
   - 校验悬空引用、自环、循环依赖（Kahn 拓扑排序）
+  - **校验 `_graph.json` 派生数据与源数据一致**：节点集、前置边集、各项计数、
+    `root_nodes` / `sink_nodes` 任一不符即失败（SPEC-06 §5.6）
   - `--url-check` 可选参数用于核验 `source.url` 可达性
 - **架构决策记录 ADR-0001**：`docs/decisions/ADR-0001-explicit-dependency-graph.md`
   - 本仓库第一份 ADR，记录依赖图的技术选型、备选方案与已知局限
@@ -66,7 +71,19 @@
 
 ### 修复
 
+- **依赖图派生数据与源数据不一致**：`_graph.json` 的 `stats.root_nodes` 误填为全部 15 个节点
+  （真实起点为 5 个），`_index.md` §4.1 又写作 4 个（漏 `kn-0015`）、§4.2 汇点清单缺失 2 项。
+  已修正三处，并在 `check_knowledge_units.py` 中新增派生数据一致性校验，
+  同时明确 `root_nodes` / `sink_nodes` 的计算口径。详见 ADR-0001 §五 与 SPEC-06 §5.6
+- **领域知识库文件名去中文化**：18 个含中文名的文件改为英文 kebab-case 命名，
+  并同步更新 6 处内部引用（CHANGELOG / ADR-0001 / knowledge README / `_index.md` /
+  scripts README / 迭代记录），避免跨平台归档与解压时出现文件名乱码
+
 ### 安全
+
+- 提交前经 `scan_secrets.py` 扫描，34 个文件无密钥、Token、`.env` 泄露
+- 经 `block_private_data.py` 校验，`knowledge/personal/` 下仅含脱敏样例 `README.md`，无真实个人数据
+- 全部 15 条 `source.url` 均经匿名访问核验可达，未由 AI 生成或推测（符合 SPEC-04 §3.3）
 
 - 明确 `knowledge/personal/` 目录下真实个人数据一律不入库，仅保留 `*.example.*` 脱敏样例
 - 语料准入强制要求 `source.url` 必须经人工逐一访问确认，不接受 AI 自述
