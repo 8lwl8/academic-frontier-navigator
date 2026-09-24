@@ -16,7 +16,8 @@
 | 会话标识 | `session-2026-09-18-01` |
 | 涉及目录 | `docs/spec/`、`knowledge/`、`schemas/`、`scripts/`、`configs/`、`data/route/`、`docs/decisions/` |
 | 对应分支 | `feat/knowledge-base-admission-spec` |
-| 对应提交 | `<待补：推送后回填 short hash>` |
+| 对应提交 | `d068201`（首次提交）、`a9a26fe`（修正派生数据不一致，见 §九 追加） |
+| 对应 PR | #1 |
 
 ---
 

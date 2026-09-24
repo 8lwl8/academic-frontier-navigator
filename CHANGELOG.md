@@ -82,9 +82,8 @@
 ### 安全
 
 - 提交前经 `scan_secrets.py` 扫描，34 个文件无密钥、Token、`.env` 泄露
-- 经 `block_private_data.py` 校验，`knowledge/personal/` 下仅含脱敏样例 `README.md`，无真实个人数据
+- 经 `block_private_data.py` 校验，`knowledge/personal/` 下仅含脱敏样例，无真实个人数据
 - 全部 15 条 `source.url` 均经匿名访问核验可达，未由 AI 生成或推测（符合 SPEC-04 §3.3）
-
 - 明确 `knowledge/personal/` 目录下真实个人数据一律不入库，仅保留 `*.example.*` 脱敏样例
 - 语料准入强制要求 `source.url` 必须经人工逐一访问确认，不接受 AI 自述
 - 个人资产库明确不记录原始对话流水，只沉淀有长期价值的结构化信息
