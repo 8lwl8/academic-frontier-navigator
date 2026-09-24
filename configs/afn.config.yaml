@@ -1,10 +1,10 @@
 # AFN 主配置
 # 依据：架构书 三(二) 定时任务设计、三(四) 知识库设计、六(二) 合规设计要点
-# 规范：SPEC-02 §5 YAML 约定
+# 规范：SPEC-02 §5 YAML 约定、SPEC-06 知识库分库与语料准入
 #
 # ⚠️ 本文件不得包含任何真实密钥。需要时使用 ${ENV_VAR_NAME} 引用环境变量。
 
-config_version: "1.0"
+config_version: "1.1"
 updated_at: "2026-09-18"
 
 # ============================================================
@@ -20,9 +20,9 @@ frontier_radar:
   # 任务范围：可配置关注的关键词集合、论文来源、时间窗口
   scope:
     keywords:
-      - 多模态
-      - 视觉语言模型
-      - 具身智能
+      - Transformer
+      - 注意力机制
+      - 序列建模
     sources:
       - arxiv
     lookback_days: 7
@@ -51,29 +51,83 @@ relevance:
   default_level: medium
   # 高相关内容优先展示
   display_order: [high, medium, low]
+  # 相关性判定依据必须具体可核验，不得为空泛描述（SPEC-06 §6.4）
+  require_reason: true
 
 # ============================================================
-# 知识库（架构书 三(四)）
+# 知识库（架构书 三(四)；SPEC-06 分库与语料准入）
 # ============================================================
 knowledge_base:
+  # ---- 分库结构（SPEC-06 §三）----
+  # 三库不得混放，也不得直接搬运，跨库须重新提炼（SPEC-06 §2.3）
   domains_path: knowledge/domains
   intelligence_path: knowledge/intelligence
   personal_path: knowledge/personal
+  index_file: knowledge/domains/_index.md
+  graph_file: knowledge/domains/_graph.json
 
-  # 语料准入标准：来源可公开访问、有明确作者与出处
+  # ---- 语料准入标准（SPEC-06 §6.1 四维量表，一票否决制）----
   ingestion:
+    # A 可访问性：来源可公开访问（架构书三(四)）
     require_source_url: true
     require_public_access: true
+    # B 出处明确：有明确作者与出处
     reject_unknown_origin: true
-    # 属于该领域奠基性或代表性成果、时效性满足要求
-    min_level: 入门
+    require_authors: true
+    # C 权威性：奠基性或代表性成果
+    allowed_levels: [入门, 经典, 前沿]
+    reject_unattributed_ai: true        # C5 不可采信：AI 生成未标注一律拒绝
+    # D 时效性：按库分别判定（SPEC-06 §6.3）
+    domains_max_age_days: null          # domains/ 无硬性年限，靠「三年后是否成立」检验
+    intelligence_max_age_days: 7        # 与 frontier_radar.scope.lookback_days 一致
+    personal_max_age_days: null
+    # 出处核验：source.url 必须由人工逐一访问确认（SPEC-04 §3.3，无例外）
+    manual_url_verification: true
+    verification_anonymous_only: true   # 只以匿名态为准，避免登录态假可达
 
-  # 知识组织：按「领域 → 子方向 → 知识点 → 文献」层级组织
+  # ---- 知识组织：按「领域 → 子方向 → 知识点 → 文献」层级（架构书 三(四)）----
+  # 四层是同一知识单元上的四个坐标，不是四个文件夹（SPEC-06 §四）
   organization:
     hierarchy: [domain, sub_domain, knowledge_point, literature]
-    # 知识点依赖关系建模，是学习路线生成的依据
-    build_dependency_graph: true
+    # L1 领域数量上限：聚焦单一细分方向，宁可窄而深（SPEC-06 §4.1）
+    max_domains: 2
+    # 知识点 id 格式与唯一性约束
+    id_pattern: "^kn-\\d{4}$"
+    id_reuse_forbidden: true            # id 永不复用，含已下线条目（SPEC-06 §7.3）
+
+  # ---- 依赖关系建模（架构书 三(四)、八章；SPEC-06 §五）----
+  # 这是本项目知识库相比普通文档库的核心差异，也是路线生成的依据
+  dependency_graph:
+    build: true
+    # 边方向：前置 → 后继（数据上写在「后继」的 prerequisites 中）
+    edge_direction: prerequisite_to_successor
+    # 关系类型，对应 schemas/route.schema.json 的 edges[].relation
+    relation_types: [prerequisite_of, related_to, extends]
+    # related_to 对称，只存一条，方向按 id 升序（SPEC-06 §5.2）
+    symmetric_related_dedup: true
+    # 强制校验：循环依赖会摧毁路线生成能力，必须拦截
     detect_cycles: true
+    reject_dangling_refs: true          # 悬空引用（指向不存在的 id）
+    reject_self_loops: true             # 自环
+    # prerequisite_of 每条须可辩护，由人工复核（脚本无法判断漏边）
+    manual_edge_review: true
+
+  # ---- 复核与退出机制（SPEC-06 §七）----
+  # 缺少退出机制的知识库会持续劣化
+  lifecycle:
+    review_interval_days: 180           # domains/ 每 6 个月复核
+    on_url_broken: update_then_retire   # 优先更新链接，无法恢复则下线
+    on_outdated: degrade                # 结论被部分修正：保留并标注局限
+    retire_on_refuted: true             # 结论被推翻：下线，且 id 不复用
+    log_review_result: true             # 复核结论（含「全部通过」）须留痕
+
+  # ---- 检索口径（SPEC-06 §八）----
+  retrieval:
+    prefer_domains: true                # 概念性问题只检索 domains/
+    isolate_personal: true              # personal/ 仅在本人会话中检索
+    always_carry_source: true           # 命中必须能带出 source.url
+    allow_empty_result: true            # 无命中时返回空，供智能体声明知识边界
+    annotate_recency: true              # intelligence/ 命中须显示 published_date
 
 # ============================================================
 # 长期记忆（架构书 三(三)）
@@ -137,3 +191,15 @@ formats:
   configuration: yaml          # YAML 承载配置
   encoding: utf-8
   line_ending: lf
+
+# ============================================================
+# 校验入口（SPEC-06 §六）
+# ============================================================
+validation:
+  # 知识单元结构、字段、依赖图（无环 / 无悬空 / 无自环）
+  knowledge_units:
+    script: scripts/check_knowledge_units.py
+    url_check_flag: --url-check
+  # data/ 下 JSON 是否符合 schemas/ 契约
+  data_schemas:
+    script: scripts/validate_schemas.py

@@ -1,0 +1,234 @@
+{
+  "schema_version": "1.0",
+  "graph_id": "graph-nlp-sequence-modeling",
+  "domain": "自然语言处理",
+  "generated_at": "2026-09-18T16:00:00+08:00",
+  "generated_by": "check-knowledge-units@v1.0",
+  "nodes": [
+    {
+      "kp_id": "kn-0001",
+      "name": "分布式表示",
+      "sub_domain": "表示学习",
+      "level": "入门",
+      "dir": "representation-learning"
+    },
+    {
+      "kp_id": "kn-0002",
+      "name": "子词切分",
+      "sub_domain": "表示学习",
+      "level": "经典",
+      "dir": "representation-learning"
+    },
+    {
+      "kp_id": "kn-0003",
+      "name": "循环神经网络",
+      "sub_domain": "序列建模",
+      "level": "入门",
+      "dir": "sequence-modeling"
+    },
+    {
+      "kp_id": "kn-0004",
+      "name": "注意力机制",
+      "sub_domain": "序列建模",
+      "level": "经典",
+      "dir": "sequence-modeling"
+    },
+    {
+      "kp_id": "kn-0005",
+      "name": "自注意力",
+      "sub_domain": "Transformer 架构",
+      "level": "经典",
+      "dir": "transformer-architecture"
+    },
+    {
+      "kp_id": "kn-0006",
+      "name": "Transformer 架构",
+      "sub_domain": "Transformer 架构",
+      "level": "经典",
+      "dir": "transformer-architecture"
+    },
+    {
+      "kp_id": "kn-0007",
+      "name": "多头注意力",
+      "sub_domain": "Transformer 架构",
+      "level": "经典",
+      "dir": "transformer-architecture"
+    },
+    {
+      "kp_id": "kn-0008",
+      "name": "残差连接",
+      "sub_domain": "训练与优化",
+      "level": "经典",
+      "dir": "training-and-optimization"
+    },
+    {
+      "kp_id": "kn-0009",
+      "name": "层归一化",
+      "sub_domain": "训练与优化",
+      "level": "经典",
+      "dir": "training-and-optimization"
+    },
+    {
+      "kp_id": "kn-0010",
+      "name": "预训练语言模型范式",
+      "sub_domain": "表示学习",
+      "level": "经典",
+      "dir": "representation-learning"
+    },
+    {
+      "kp_id": "kn-0011",
+      "name": "自回归语言模型的规模化",
+      "sub_domain": "表示学习",
+      "level": "前沿",
+      "dir": "representation-learning"
+    },
+    {
+      "kp_id": "kn-0012",
+      "name": "生成式预训练与对齐训练",
+      "sub_domain": "表示学习",
+      "level": "前沿",
+      "dir": "representation-learning"
+    },
+    {
+      "kp_id": "kn-0013",
+      "name": "视觉 Transformer",
+      "sub_domain": "跨模态与架构迁移",
+      "level": "前沿",
+      "dir": "cross-modal"
+    },
+    {
+      "kp_id": "kn-0014",
+      "name": "扩散生成",
+      "sub_domain": "跨模态与架构迁移",
+      "level": "前沿",
+      "dir": "cross-modal"
+    },
+    {
+      "kp_id": "kn-0015",
+      "name": "自适应优化器",
+      "sub_domain": "训练与优化",
+      "level": "经典",
+      "dir": "training-and-optimization"
+    }
+  ],
+  "edges": [
+    {
+      "from": "kn-0001",
+      "to": "kn-0002",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0001",
+      "to": "kn-0003",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0003",
+      "to": "kn-0004",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0004",
+      "to": "kn-0005",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0005",
+      "to": "kn-0006",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0008",
+      "to": "kn-0006",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0009",
+      "to": "kn-0006",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0005",
+      "to": "kn-0007",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0006",
+      "to": "kn-0010",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0006",
+      "to": "kn-0011",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0011",
+      "to": "kn-0012",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0006",
+      "to": "kn-0013",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0008",
+      "to": "kn-0009",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0010",
+      "to": "kn-0011",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0005",
+      "to": "kn-0007",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0008",
+      "to": "kn-0015",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0009",
+      "to": "kn-0015",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0013",
+      "to": "kn-0014",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0002",
+      "to": "kn-0003",
+      "relation": "related_to"
+    }
+  ],
+  "stats": {
+    "total_nodes": 15,
+    "total_edges": 19,
+    "prerequisite_edges": 12,
+    "related_edges": 7,
+    "root_nodes": [
+      "kn-0001",
+      "kn-0008",
+      "kn-0009",
+      "kn-0014",
+      "kn-0015"
+    ],
+    "sink_nodes": [
+      "kn-0002",
+      "kn-0007",
+      "kn-0010",
+      "kn-0012",
+      "kn-0013",
+      "kn-0014",
+      "kn-0015"
+    ],
+    "has_cycle": false
+  }
+}

@@ -1,0 +1,464 @@
+{
+  "schema_version": "1.0",
+  "route_id": "route-nlp-transformer-2026-09-18",
+  "topic": "自然语言处理 · 序列建模与 Transformer 架构",
+  "generated_at": "2026-09-18T16:00:00+08:00",
+  "generated_by": "route-generate@v1.0",
+  "user_profile_ref": "profile-anon-example",
+  "stages": [
+    {
+      "stage_id": "stage-01",
+      "name": "前置基础与表示学习起点",
+      "order": 1,
+      "estimated_weeks": 3.0,
+      "knowledge_points": [
+        {
+          "kp_id": "kn-0001",
+          "name": "分布式表示",
+          "level": "入门",
+          "status": "not_started",
+          "prerequisites": [],
+          "source": {
+            "type": "paper",
+            "title": "Efficient Estimation of Word Representations in Vector Space",
+            "authors": [
+              "Tomas Mikolov",
+              "Kai Chen",
+              "Greg Corrado",
+              "Jeffrey Dean"
+            ],
+            "url": "https://arxiv.org/abs/1301.3781",
+            "published_date": "2013-01-16"
+          }
+        },
+        {
+          "kp_id": "kn-0008",
+          "name": "残差连接",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [],
+          "source": {
+            "type": "paper",
+            "title": "Deep Residual Learning for Image Recognition",
+            "authors": [
+              "Kaiming He",
+              "Xiangyu Zhang",
+              "Shaoqing Ren",
+              "Jian Sun"
+            ],
+            "url": "https://arxiv.org/abs/1512.03385",
+            "published_date": "2015-12-10"
+          }
+        },
+        {
+          "kp_id": "kn-0009",
+          "name": "层归一化",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [],
+          "source": {
+            "type": "paper",
+            "title": "Layer Normalization",
+            "authors": [
+              "Jimmy Lei Ba",
+              "Jamie Ryan Kiros",
+              "Geoffrey E. Hinton"
+            ],
+            "url": "https://arxiv.org/abs/1607.06450",
+            "published_date": "2016-07-21"
+          }
+        },
+        {
+          "kp_id": "kn-0014",
+          "name": "扩散生成",
+          "level": "前沿",
+          "status": "not_started",
+          "prerequisites": [],
+          "source": {
+            "type": "paper",
+            "title": "Denoising Diffusion Probabilistic Models",
+            "authors": [
+              "Jonathan Ho",
+              "Ajay Jain",
+              "Pieter Abbeel"
+            ],
+            "url": "https://arxiv.org/abs/2006.11239",
+            "published_date": "2020-06-19"
+          }
+        },
+        {
+          "kp_id": "kn-0015",
+          "name": "自适应优化器",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [],
+          "source": {
+            "type": "paper",
+            "title": "Adam: A Method for Stochastic Optimization",
+            "authors": [
+              "Diederik P. Kingma",
+              "Jimmy Ba"
+            ],
+            "url": "https://arxiv.org/abs/1412.6980",
+            "published_date": "2014-12-22"
+          }
+        }
+      ]
+    },
+    {
+      "stage_id": "stage-02",
+      "name": "序列建模与注意力演进",
+      "order": 2,
+      "estimated_weeks": 1.5,
+      "knowledge_points": [
+        {
+          "kp_id": "kn-0002",
+          "name": "子词切分",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0001"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "Enriching Word Vectors with Subword Information",
+            "authors": [
+              "Piotr Bojanowski",
+              "Edouard Grave",
+              "Armand Joulin",
+              "Tomas Mikolov"
+            ],
+            "url": "https://arxiv.org/abs/1607.04606",
+            "published_date": "2016-07-15"
+          }
+        },
+        {
+          "kp_id": "kn-0003",
+          "name": "循环神经网络",
+          "level": "入门",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0001"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "Sequence to Sequence Learning with Neural Networks",
+            "authors": [
+              "Ilya Sutskever",
+              "Oriol Vinyals",
+              "Quoc V. Le"
+            ],
+            "url": "https://arxiv.org/abs/1409.3215",
+            "published_date": "2014-09-10"
+          }
+        }
+      ]
+    },
+    {
+      "stage_id": "stage-03",
+      "name": "自注意力与 Transformer 核心算子",
+      "order": 3,
+      "estimated_weeks": 1.0,
+      "knowledge_points": [
+        {
+          "kp_id": "kn-0004",
+          "name": "注意力机制",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0003"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "Neural Machine Translation by Jointly Learning to Align and Translate",
+            "authors": [
+              "Dzmitry Bahdanau",
+              "Kyunghyun Cho",
+              "Yoshua Bengio"
+            ],
+            "url": "https://arxiv.org/abs/1409.0473",
+            "published_date": "2014-09-01"
+          }
+        }
+      ]
+    },
+    {
+      "stage_id": "stage-04",
+      "name": "Transformer 完整架构成型",
+      "order": 4,
+      "estimated_weeks": 1.0,
+      "knowledge_points": [
+        {
+          "kp_id": "kn-0005",
+          "name": "自注意力",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0004"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "Attention Is All You Need",
+            "authors": [
+              "Ashish Vaswani",
+              "Noam Shazeer",
+              "Niki Parmar",
+              "Jakob Uszkoreit"
+            ],
+            "url": "https://arxiv.org/abs/1706.03762",
+            "published_date": "2017-06-12"
+          }
+        }
+      ]
+    },
+    {
+      "stage_id": "stage-05",
+      "name": "预训练范式与跨模态迁移",
+      "order": 5,
+      "estimated_weeks": 1.5,
+      "knowledge_points": [
+        {
+          "kp_id": "kn-0006",
+          "name": "Transformer 架构",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0005",
+            "kn-0008",
+            "kn-0009"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "Attention Is All You Need",
+            "authors": [
+              "Ashish Vaswani",
+              "Noam Shazeer",
+              "Niki Parmar",
+              "Jakob Uszkoreit"
+            ],
+            "url": "https://arxiv.org/abs/1706.03762",
+            "published_date": "2017-06-12"
+          }
+        },
+        {
+          "kp_id": "kn-0007",
+          "name": "多头注意力",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0005"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "Attention Is All You Need",
+            "authors": [
+              "Ashish Vaswani",
+              "Noam Shazeer",
+              "Niki Parmar",
+              "Jakob Uszkoreit"
+            ],
+            "url": "https://arxiv.org/abs/1706.03762",
+            "published_date": "2017-06-12"
+          }
+        }
+      ]
+    },
+    {
+      "stage_id": "stage-06",
+      "name": "规模化与对齐",
+      "order": 6,
+      "estimated_weeks": 2.0,
+      "knowledge_points": [
+        {
+          "kp_id": "kn-0010",
+          "name": "预训练语言模型范式",
+          "level": "经典",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0006"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+            "authors": [
+              "Jacob Devlin",
+              "Ming-Wei Chang",
+              "Kenton Lee",
+              "Kristina Toutanova"
+            ],
+            "url": "https://arxiv.org/abs/1810.04805",
+            "published_date": "2018-10-11"
+          }
+        },
+        {
+          "kp_id": "kn-0011",
+          "name": "自回归语言模型的规模化",
+          "level": "前沿",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0006"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "Language Models are Few-Shot Learners",
+            "authors": [
+              "Tom B. Brown",
+              "Benjamin Mann",
+              "Nick Ryder",
+              "Melanie Subbiah"
+            ],
+            "url": "https://arxiv.org/abs/2005.14165",
+            "published_date": "2020-05-28"
+          }
+        },
+        {
+          "kp_id": "kn-0013",
+          "name": "视觉 Transformer",
+          "level": "前沿",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0006"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale",
+            "authors": [
+              "Alexey Dosovitskiy",
+              "Lucas Beyer",
+              "Alexander Kolesnikov",
+              "Dirk Weissenborn"
+            ],
+            "url": "https://arxiv.org/abs/2010.11929",
+            "published_date": "2020-10-22"
+          }
+        }
+      ]
+    },
+    {
+      "stage_id": "stage-07",
+      "name": "对齐训练的深化与前沿跟进",
+      "order": 7,
+      "estimated_weeks": 1.0,
+      "knowledge_points": [
+        {
+          "kp_id": "kn-0012",
+          "name": "生成式预训练与对齐训练",
+          "level": "前沿",
+          "status": "not_started",
+          "prerequisites": [
+            "kn-0011"
+          ],
+          "source": {
+            "type": "paper",
+            "title": "Training language models to follow instructions with human feedback",
+            "authors": [
+              "Long Ouyang",
+              "Jeff Wu",
+              "Xu Jiang",
+              "Diogo Almeida"
+            ],
+            "url": "https://arxiv.org/abs/2203.02155",
+            "published_date": "2022-03-04"
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "from": "kn-0001",
+      "to": "kn-0002",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0001",
+      "to": "kn-0003",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0003",
+      "to": "kn-0004",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0004",
+      "to": "kn-0005",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0005",
+      "to": "kn-0006",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0008",
+      "to": "kn-0006",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0009",
+      "to": "kn-0006",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0005",
+      "to": "kn-0007",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0006",
+      "to": "kn-0010",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0006",
+      "to": "kn-0011",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0011",
+      "to": "kn-0012",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0006",
+      "to": "kn-0013",
+      "relation": "prerequisite_of"
+    },
+    {
+      "from": "kn-0008",
+      "to": "kn-0009",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0010",
+      "to": "kn-0011",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0005",
+      "to": "kn-0007",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0008",
+      "to": "kn-0015",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0009",
+      "to": "kn-0015",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0013",
+      "to": "kn-0014",
+      "relation": "related_to"
+    },
+    {
+      "from": "kn-0002",
+      "to": "kn-0003",
+      "relation": "related_to"
+    }
+  ]
+}
