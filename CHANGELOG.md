@@ -17,12 +17,48 @@
 
 ### 新增
 
-- 建立项目仓库与文档规范体系：仓库与文档规范总纲、目录结构规范、格式约定、版本管理与留痕规范、AI 使用边界规范、Git 建仓推送手册
-- 新增版本留痕模板：变更日志、迭代记录、架构决策记录、提交信息、拉取请求、发布说明
-- 新增 JSON Schema：学习路线、每日简报
-- 新增工具链配置：commitlint、pre-commit、EditorConfig
+- **知识库分库与语料准入规范（SPEC-06）**：将架构书三(四)知识库设计从结论性描述落地为可执行规则
+  - 三分库判据：按「是否稳定 / 是否有时效 / 是否个人专属」三个属性划分，替代按内容主题划分
+  - 四层组织模型：领域 → 子方向 → 知识点 → 文献，由 front matter 字段承载
+  - 依赖关系模型：`prerequisites` 字段为唯一事实来源，导出为机器可读的边表
+  - 四维语料准入量表：可访问性 / 出处明确 / 权威性 / 时效性，采用**一票否决制**
+  - 权威性分级 C1~C5，其中 C5（不可采信）为硬拒绝
+  - 语料的复核与退出机制：链接失效、结论被推翻、时效衰减三类情况的处置路径
+- **领域知识库首个样例领域**：以「自然语言处理 · 序列建模与 Transformer」为例，落地 15 个知识单元
+  - 覆盖 5 个子方向：表示学习、序列建模、Transformer 架构、训练与优化、跨模态与架构迁移
+  - 知识单元编号 `kn-0001` ~ `kn-0015`，全局唯一且不可复用
+  - 全部 15 条 `source.url` 均为经人工核验可达的真实 arXiv 页面
+- **知识点依赖图导出**：`knowledge/domains/_graph.json`
+  - 15 个节点、19 条边（12 条前置关系 + 7 条相关关系）
+  - 无循环依赖，起始节点 5 个：kn-0001 / kn-0008 / kn-0009 / kn-0014 / kn-0015
+- **知识库索引**：`knowledge/domains/_index.md`，登记子方向、知识点清单、依赖概览与已知缺口
+- **动态情报库说明**：`knowledge/intelligence/README.md`，含双层存储（JSON 机器可读 + Markdown 人读）、
+  幂等命名规则、降级处理约定
+- **个人资产库说明与脱敏样例**：`knowledge/personal/README.md`，含四层记忆结构
+  （用户画像 / 进度记忆 / 偏好记忆 / 项目轨迹）与脱敏规则
+- **知识点依赖图 Schema**：`schemas/knowledge-graph.schema.json`
+  - 采用 JSON Schema Draft 2020-12，`stats.has_cycle` 硬约束为 `false`
+- **知识单元校验脚本**：`scripts/check_knowledge_units.py`
+  - 校验 front matter 完整性、编号格式与全局唯一性、子方向登记状态
+  - 校验悬空引用、自环、循环依赖（Kahn 拓扑排序）
+  - `--url-check` 可选参数用于核验 `source.url` 可达性
+- **架构决策记录 ADR-0001**：`docs/decisions/ADR-0001-explicit-dependency-graph.md`
+  - 本仓库第一份 ADR，记录依赖图的技术选型、备选方案与已知局限
+- **路线生成端到端验证样例**：`data/route/route-nlp-transformer.json`
+  - 按拓扑深度自动分 7 个阶段，验证依赖图可实际驱动学习路线生成
+- **迭代记录**：`iteration-log/2026-09-18-knowledge-base-and-corpus-admission.md`
 
 ### 变更
+
+- **配置版本升级**：`configs/afn.config.yaml` 由 `config_version: 1.0` 升至 `1.1`
+  - 新增 `knowledge_base` 段：准入约束、组织约束、依赖图开关、生命周期、检索口径
+  - 新增 `validation` 段：登记四个校验脚本
+  - 新增 `relevance.require_reason`：相关性判断必须给出理由
+  - `frontier_radar.scope.keywords` 调整为 `[Transformer, 注意力机制, 序列建模]`
+- **知识库入口重写**：`knowledge/README.md` 指向 SPEC-06，并保留三分库总表
+- **Schema 索引更新**：`schemas/README.md` 登记 `knowledge-graph.schema.json`
+- **脚本索引更新**：`scripts/README.md` 登记 `check_knowledge_units.py`，
+  并明确列出脚本能检出与**检不出**的问题类型
 
 ### 废弃
 
@@ -31,6 +67,11 @@
 ### 修复
 
 ### 安全
+
+- 明确 `knowledge/personal/` 目录下真实个人数据一律不入库，仅保留 `*.example.*` 脱敏样例
+- 语料准入强制要求 `source.url` 必须经人工逐一访问确认，不接受 AI 自述
+- 个人资产库明确不记录原始对话流水，只沉淀有长期价值的结构化信息
+  （依据：架构书三(三) 长期记忆设计）
 
 ---
 

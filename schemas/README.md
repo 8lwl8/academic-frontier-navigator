@@ -7,6 +7,7 @@
 | `route.schema.json` | 学习路线 | `data/route/` |
 | `briefing.schema.json` | 每日简报 | `data/briefing/` |
 | `asset.schema.json` | 知识资产 | `data/assets/` |
+| `knowledge-graph.schema.json` | 知识点依赖图导出 | `knowledge/domains/_graph.json` |
 
 ## 校验
 
@@ -31,3 +32,14 @@ Schema 内的 `schema_version` 字段与 Schema 文件本身**同步演进**：
 - 学术内容必须含 `source` 对象，`source.url` 必填。
 - 时间格式：`YYYY-MM-DD` 或带 `+08:00` 时区的 ISO 8601。
 - 字段名一律 `lower_snake_case`。
+
+## 关于 `knowledge-graph.schema.json`
+
+该 Schema 校验的是**依赖图的导出产物** `knowledge/domains/_graph.json`，
+不是人类阅读的 `knowledge/domains/_index.md`。两者是同源的两份视图：
+
+- `_index.md` 面向人：子方向登记、知识点清单、缺口与待办。
+- `_graph.json` 面向机器：节点表 + 边表 + 统计量，供路线生成与 Web 侧绘图消费。
+
+它的权威来源仍是各知识单元 front matter 里的 `prerequisites` 字段
+（详见 SPEC-06 §5 与 ADR-0001）。
